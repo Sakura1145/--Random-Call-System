@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>随机点名系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>随机点名系统v0.1.1</h1>
+
+    <select id="classSelector">
+        <option value="A班">A班</option>
+        <option value="B班">B班</option>
+    </select>
+    <input type="text" id="studentName" placeholder="输入学生姓名">
+    <button onclick="addStudent()">添加学生</button>
+
+    <p id="studentList"></p>
+
+    <button onclick="exportToExcel()">保存至Excel</button>
+
+    <input type="file" id="fileInput" accept=".xlsx" style="display: none;">
+    <button onclick="document.getElementById('fileInput').click()">上传Excel文件</button>
+
+    <p id="result"></p>
+    <button onclick="randomName()">随机点名</button>
+
+    <script>
+        var students = {};
+
+        function addStudent() {
+            var studentName = document.getElementById('studentName').value;
+            var selectedClass = document.getElementById('classSelector').value;
+
+            if (studentName.trim() !== "") {
+                if (!students[selectedClass]) {
+                    students[selectedClass] = [];
+                }
+                students[selectedClass].push(studentName);
+                updateStudentList();
+                document.getElementById('studentName').value = "";
+            } else {
+                alert("请输入有效的学生姓名！");
+            }
+        }
+
+        function updateStudentList() {
+            var studentListText = "学生名单：<br>";
+            for (var className in students) {
+                if (students.hasOwnProperty(className)) {
+                    studentListText += className + ": " + students[className].join(', ') + "<br>";
+                }
+            }
+            document.getElementById("studentList").innerHTML = studentListText;
+        }
+
+        function randomName() {
+            var selectedClass = document.getElementById('classSelector').value;
+            var studentList = students[selectedClass];
+            if (!studentList || studentList.length === 0) {
+                alert("该班级学生名单为空！");
+            } else {
+                var randomIndex = Math.floor(Math.random() * studentList.length);
+                var randomStudent = studentList[randomIndex];
+                document.getElementById("result").innerText = "被点到的同学是：" + randomStudent;
+            }
+        }
+
+        function exportToExcel() {
+            var wb = XLSX.utils.book_new();
+            for (var className in students) {
+                if (students.hasOwnProperty(className)) {
+                    var ws = XLSX.utils.aoa_to_sheet([['姓名'], ...students[className].map(name => [name])]);
+                    XLSX.utils.book_append_sheet(wb, ws, className);
+                }
+            }
+            var wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+            saveAs(new Blob([wbout],{type:"application/octet-stream"}), "学生名单.xlsx");
+        }
+
+        function importFromExcel(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var data = new Uint8Array(e.target.result);
+                var workbook = XLSX.read(data, {type: 'array'});
+                for (var className in workbook.Sheets) {
+                    students[className] = XLSX.utils.sheet_to_json(workbook.Sheets[className], {header: ['name']}).map(student => student.name);
+                }
+                updateStudentList();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            importFromExcel(event.target.files[0]);
+        });
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+</body>
+</html>
