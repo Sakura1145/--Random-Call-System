@@ -1,4 +1,4 @@
-随机点名系统v0.1.2操作指引
+随机点名系统v0.1.3操作指引
 
 一、说明
 
@@ -18,3 +18,5 @@
 
 
 *在使用中有任何问题可发送反馈邮件至 elysia1145@email.swu.edu.cn
+
+![77aab5e7a4b0f81e66f9b3b37c3c968f](https://github.com/Sakura1145/--Random-Call-System/assets/137955819/821f8aae-af8d-4070-b85e-a4a66dd5d4af)
