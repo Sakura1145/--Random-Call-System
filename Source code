@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>随机点名系统v0.1.2</title>
+    <title>随机点名系统v0.1.3</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,23 +17,33 @@
     </style>
 </head>
 <body>
-    <h1>随机点名系统v0.1.2</h1>
-    <h4>v0.1.2更新内容：1、增加了自动保存学生姓名功能   2、在网页底部新增操作指引   3、更新了网页UI<h4>
-    
+    <h1>随机点名系统v0.1.3</h1>
+
     <select id="classSelector">
         <option value="A班">A班</option>
         <option value="B班">B班</option>
+        <option value="C班">C班</option>
     </select>
     <input type="text" id="studentName" placeholder="输入学生姓名">
     <button onclick="addStudent()">添加学生</button>
 
-    <p id="studentList"></p>
+    <p id="studentList" style="display: none;"></p>
+<p style="text-align: center;">
+        <a href="javascript:void(0)" onclick="toggleStudentList()" style="font-size: 18px; color: blue;">显示/隐藏学生名单</a>
+        &nbsp;|&nbsp;
+        <a href="javascript:void(0)" onclick="displayUpdates()" style="font-size: 18px; color: blue;">显示当前版本更新内容</a>
+    </p>
+
+    <script>
+      function displayUpdates() {
+          alert("v0.1.3更新内容：\n1、添加了显示/隐藏学生姓名和当前版本更新内容的选项\n2、在网页底部添加了“问题反馈”和“作者主页”超链接\n3、增加了可选班级数至3个\n4、对操作说明进行了小幅修改");
+       }
+    </script>
 
     <button onclick="exportToExcel()">保存至Excel</button>
-
     <input type="file" id="fileInput" accept=".xlsx" style="display: none;">
     <button onclick="document.getElementById('fileInput').click()">上传Excel文件</button>
-
+     
     <p id="result"></p>
     <button onclick="randomName()">随机点名</button>
     <style>
@@ -144,22 +154,22 @@
         var instructions = `
             <div id="overlay">
                 <div id="instructions">
-                    <h2>随机点名系统v0.1.2操作指引</h2>
+                    <h2>随机点名系统v0.1.3操作指引</h2>
                     <h3>一、说明</h3>
                     <p>
-                        本系统为github开源项目，使用者可在 <a href="https://github.com/Sakura1145/--Random-Call-System" target="_blank">https://github.com/Sakura1145/--Random-Call-System</a> 下载最新版或提出改进意见（发布issue）。<br>
-                        本系统暂时仅支持最多两个班级点名，后续将完善。
+                        本系统为html（网页）应用，已在github开源，使用者可在 <a href="https://github.com/Sakura1145/--Random-Call-System" target="_blank">https://github.com/Sakura1145/--Random-Call-System</a> 下载最新版或提出改进意见（发布issue）。<br>
+                        本系统暂时仅支持最多3个班级点名，后续将完善。
                     </p>
 
                     <h3>二、操作指引</h3>
                     <ol>
-                        <li>使用者下载本系统后，仅需将其解压到目标位置，然后双击随机点名v0.1.2.html即可使用。</li>
+                        <li>使用者下载本系统后，仅需将其解压到目标位置，然后双击随机点名v0.1.3.html即可使用。</li>
                         <li>导入学生姓名
                             <ul>
                                 <li>方法一（不推荐）：使用者可在界面中分班级输入姓名，但需要注意的是添加学生时应单次仅输入一个姓名，否则会导致系统将多个名字识别为单个学生的名字。注意：本方法暂不支持修改学生姓名！</li>
-                                <li>方法二：使用者可以将本地Excel文档中的姓名上传至系统，但需注意系统只能识别第一列单元格中靠左对齐的姓名，且第一列中只能保留学生姓名，不能添加其他内容，否则会将该内容识别为姓名。进行多班级导入姓名时，仅需将文档的Sheet1与Sheet2分别更名为A班与B班，并删除Sheet3（后续会完善）后按上述格式导入即可。</li>
+                                <li>方法二：使用者可以将本地Excel文档中的姓名上传至系统，但需注意系统只能识别第一列单元格中靠左对齐的姓名，且第一列中只能保留学生姓名，不能添加其他内容，否则会将该内容识别为姓名。进行多班级导入姓名时，仅需将工作表的Sheet分别更名为A班、B班与C班后按上述格式导入即可。</li>
                         </ul></li>
-                        <li>修改班名：需要修改班名的使用者可将下载的代码后缀改为.txt，然后将该文档中所有的A班、B班改为目标班名，再将后缀改为.html即可。</li>
+                        <li>修改班名：需要修改班名的使用者可将下载的网页后缀改为.txt，然后将该文档中所有的A班、B班替换为目标班名，再将后缀改为.html即可。</li>
                     </ol>
 
                     <p>*在使用中有任何问题可发送反馈邮件至 <a href="mailto:elysia1145@email.swu.edu.cn">elysia1145@email.swu.edu.cn</a></p>
@@ -213,11 +223,25 @@
         var overlay = document.getElementById('overlay');
         overlay.remove();
     }
+     function toggleStudentList() {
+     var studentList = document.getElementById("studentList");
+     if (studentList.style.display === "none") {
+         studentList.style.display = "block";
+     } else {
+                studentList.style.display = "none";
+            }
+        }
+
 </script>
 
 <p style="text-align: center;">
-    <a href="javascript:void(0)" onclick="displayInstructions()" style="font-size: 18px; color: blue;">随机点名系统v0.1.2操作指引</a>
+    <a href="javascript:void(0)" onclick="displayInstructions()" style="font-size: 18px; color: blue;">随机点名系统v0.1.3操作指引</a>
 </p>
+
+<footer style="text-align: center; margin-top: 8px;">
+    <p>反馈邮箱： <a href="mailto:elysia1145@email.swu.edu.cn">elysia1145@email.swu.edu.cn</a></p>
+    <p><a href="https://github.com/Sakura1145/--Random-Call-System" target="_blank">作者主页</a></p>
+</footer>
 
 </body>
 </html>
