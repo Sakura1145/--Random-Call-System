@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>随机点名系统v0.1.4</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        select {
+            padding: 5px;
+        }
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>随机点名系统v0.1.4</h1>
+
+    <select id="classSelector">
+        <option value="A班">A班</option>
+        <option value="B班">B班</option>
+        <option value="C班">C班</option>
+    </select>
+    <input type="text" id="studentName" placeholder="输入学生姓名">
+    <button onclick="addStudent()">添加学生</button>
+
+    <p id="studentList" style="display: none;"></p>
+    <p style="text-align: center;">
+        <a href="javascript:void(0)" onclick="toggleStudentList()">显示/隐藏学生名单</a>
+        &nbsp;|&nbsp;
+        <a href="javascript:void(0)" onclick="displayUpdates()">显示当前版本更新内容</a>
+    </p>
+
+    <button onclick="exportToExcel()">保存至Excel</button>
+    <input type="file" id="fileInput" accept=".xlsx" style="display: none;">
+    <button onclick="document.getElementById('fileInput').click()">上传Excel文件</button>
+     
+    <p id="result"></p>
+    <button onclick="randomName()">随机点名</button>
+
+    <script>
+    var students = {};
+
+        // 从本地存储中获取学生名单数据
+        if (localStorage.getItem('students')) {
+            students = JSON.parse(localStorage.getItem('students'));
+            updateStudentList();
+        }
+
+        function addStudent() {
+            var studentName = document.getElementById('studentName').value;
+            var selectedClass = document.getElementById('classSelector').value;
+
+            if (studentName.trim() !== "") {
+                if (!students[selectedClass]) {
+                    students[selectedClass] = [];
+                }
+                students[selectedClass].push(studentName);
+                updateStudentList();
+                document.getElementById('studentName').value = "";
+                saveStudentsToLocalStorage();
+            } else {
+                alert("请输入有效的学生姓名！");
+            }
+        }
+
+        function updateStudentList() {
+            var studentListText = "学生名单：<br>";
+            for (var className in students) {
+                if (students.hasOwnProperty(className)) {
+                    studentListText += className + ": " + students[className].join(', ') + "<br>";
+                }
+            }
+            document.getElementById("studentList").innerHTML = studentListText;
+        }
+
+        function randomName() {
+            var selectedClass = document.getElementById('classSelector').value;
+            var studentList = students[selectedClass];
+            if (!studentList || studentList.length === 0) {
+                alert("该班级学生名单为空！");
+            } else {
+                var randomIndex = Math.floor(Math.random() * studentList.length);
+                var randomStudent = studentList[randomIndex];
+                var enlargedText = "<span style='font-size: 24px;'><strong>" + randomStudent + "</strong></span>";
+                document.getElementById("result").innerHTML = "被点到的同学是：" + enlargedText;
+            }
+        }
+
+        function exportToExcel() {
+            var wb = XLSX.utils.book_new();
+            for (var className in students) {
+                if (students.hasOwnProperty(className)) {
+                    var ws = XLSX.utils.aoa_to_sheet([['姓名'], ...students[className].map(name => [name])]);
+                    XLSX.utils.book_append_sheet(wb, ws, className);
+                }
+            }
+            var wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+            saveAs(new Blob([wbout],{type:"application/octet-stream"}), "学生名单.xlsx");
+        }
+
+        function importFromExcel(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var data = new Uint8Array(e.target.result);
+                var workbook = XLSX.read(data, {type: 'array'});
+                for (var className in workbook.Sheets) {
+                    students[className] = XLSX.utils.sheet_to_json(workbook.Sheets[className], {header: ['name']}).map(student => student.name);
+                }
+                updateStudentList();
+                saveStudentsToLocalStorage();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function saveStudentsToLocalStorage() {
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            importFromExcel(event.target.files[0]);
+        });
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+<script>
+    function displayInstructions() {
+        var instructions = `
+            <div id="overlay">
+                <div id="instructions">
+                    <h2>随机点名系统v0.1.4操作指引</h2>
+                    <h3>一、说明</h3>
+                    <p>
+                        本系统为html（网页）应用，已在github开源，使用者可在 <a href="https://github.com/Sakura1145/--Random-Call-System" target="_blank">https://github.com/Sakura1145/--Random-Call-System</a> 下载最新版或提出改进意见（发布issue）。<br>
+                        本系统暂时仅支持最多3个班级点名，后续将完善。
+                    </p>
+
+                    <h3>二、操作指引</h3>
+                    <ol>
+                        <li>使用者下载本系统后，仅需将其解压到目标位置，然后双击随机点名v0.1.4.html即可使用。</li>
+                        <li>导入学生姓名
+                            <ul>
+                                <li>方法一（不推荐）：使用者可在界面中分班级输入姓名，但需要注意的是添加学生时应单次仅输入一个姓名，否则会导致系统将多个名字识别为单个学生的名字。注意：本方法暂不支持修改学生姓名！</li>
+                                <li>方法二：使用者可以将本地Excel文档中的姓名上传至系统，但需注意系统只能识别第一列单元格中靠左对齐的姓名，且第一列中只能保留学生姓名，不能添加其他内容，否则会将该内容识别为姓名。进行多班级导入姓名时，仅需将工作表的Sheet分别更名为A班、B班与C班后按上述格式导入即可。</li>
+                        </ul></li>
+                        <li>修改班名：需要修改班名的使用者可将下载的网页后缀改为.txt，然后将该文档中所有的A班、B班替换为目标班名，再将后缀改为.html即可。</li>
+                    </ol>
+
+                    <p>*在使用中有任何问题可发送反馈邮件至 <a href="mailto:elysia1145@email.swu.edu.cn">elysia1145@email.swu.edu.cn</a></p>
+                    <button onclick="closeInstructions()">关闭</button>
+                </div>
+            </div>
+            <style>
+                #overlay {
+                    position: fixed;
+                    display: block;
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0,0,0,0.5);
+                    z-index: 2;
+                    cursor: pointer;
+                }
+                #instructions {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    text-align: left;
+                    max-height: 80%;
+                    overflow-y: auto;
+                }
+                button {
+                    margin-top: 20px;
+                    padding: 10px 20px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                }
+                button:hover {
+                    background-color: #45a049;
+                }
+            </style>
+        `;
+        document.body.insertAdjacentHTML('beforeend', instructions);
+    }
+
+    function closeInstructions() {
+        var overlay = document.getElementById('overlay');
+        overlay.remove();
+    }
+     function toggleStudentList() {
+     var studentList = document.getElementById("studentList");
+     if (studentList.style.display === "none") {
+         studentList.style.display = "block";
+     } else {
+                studentList.style.display = "none";
+            }
+        }
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <script>
+   function displayUpdates() {
+          alert("v0.1.4更新内容：\n1、优化了界面排版与部分文本描述\n2、优化了底层代码逻辑");
+       }
+    </script>
+
+    <p style="text-align: center;">
+        <a href="javascript:void(0)" onclick="displayInstructions()">随机点名系统v0.1.4操作指引</a>
+    </p>
+
+    <footer style="text-align: center; margin-top: 8px;">
+        <p><a href="mailto:elysia1145@email.swu.edu.cn" target="_blank"><strong>反馈邮箱</strong></a>||<a href="https://github.com/Sakura1145/--Random-Call-System" target="_blank"><strong>项目主页</strong></a></p>
+    </footer>
+
+</body>
+</html>
+
+
