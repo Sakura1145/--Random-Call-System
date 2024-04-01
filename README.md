@@ -23,6 +23,8 @@
 
 3.修改班名：需要修改班名的使用者可将下载的网页后缀改为.txt，然后将该文档中所有的A班、B班替换为目标班名，再将后缀改为.html即可。
 
+捐赠入口：https://afdian.net/a/kafkafka
+![13233f59011335045c6ccadc59e0efe3](https://github.com/Sakura1145/--Random-Call-System/assets/137955819/a61e7c04-c474-4114-944a-e57ce6cd02d7)
 
 *在使用中有任何问题可发送反馈邮件至 elysia1145@email.swu.edu.cn
 
